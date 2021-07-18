@@ -3,6 +3,7 @@ package com.ibareq.weathersample.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.ibareq.weathersample.data.Status
 import com.ibareq.weathersample.data.response.WeatherResponse
 import com.ibareq.weathersample.databinding.ActivityMainBinding
@@ -39,16 +40,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onWeatherResult(response: Status<WeatherResponse>){
+        hideAllViews()
         when(response){
             is Status.Error -> {
-                Log.i(TAG, response.message)
+                binding.imageError.show()
             }
             is Status.Loading -> {
-                Log.i(TAG, response.toString())
+                binding.progressLoading.show()
             }
-            is Status.Success<*> -> {
-                Log.i(TAG, response.data.toString())
+            is Status.Success -> {
+                binding.textMaxTemp.run {
+                    show()
+                    text = response.data.consolidatedWeather[0].maxTemp.toString()
+                }
             }
+        }
+    }
+
+    private fun hideAllViews(){
+        binding.run {
+            progressLoading.hide()
+            textMaxTemp.hide()
+            imageError.hide()
+
         }
     }
 
@@ -57,4 +71,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+}
+
+fun View.hide() {
+    this.visibility = View.GONE
+}
+
+fun View.show() {
+    this.visibility = View.VISIBLE
 }
