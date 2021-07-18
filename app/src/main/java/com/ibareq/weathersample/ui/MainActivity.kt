@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import com.ibareq.weathersample.data.repository.*
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,8 +22,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         binding.buttonSearch.setOnClickListener {
-            getWeatherForCity("Baghdad")
+            getWeatherForCity(binding.inputCityName.text.toString())
         }
     }
 
@@ -51,7 +53,9 @@ class MainActivity : AppCompatActivity() {
             is Status.Success -> {
                 binding.textMaxTemp.run {
                     show()
-                    text = response.data.consolidatedWeather[0].maxTemp.toString()
+                    val maxTemp = response.data.consolidatedWeather[0].maxTemp.roundToInt().toString()
+                    val cityName = response.data.title
+                    text = "$cityName: $maxTemp"
                 }
             }
         }
