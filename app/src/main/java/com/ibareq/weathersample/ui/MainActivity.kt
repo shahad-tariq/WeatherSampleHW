@@ -35,10 +35,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getWeatherForCity(cityName: String){
-        WeatherRepository.getWeatherForCity(cityName)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(::onWeatherResult)
+        disposable.add(
+            WeatherRepository.getWeatherForCity(cityName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::onWeatherResult)
+        )
     }
 
     private fun onWeatherResult(response: Status<WeatherResponse>){
@@ -51,13 +53,17 @@ class MainActivity : AppCompatActivity() {
                 binding.progressLoading.show()
             }
             is Status.Success -> {
-                binding.textMaxTemp.run {
-                    show()
-                    val maxTemp = response.data.consolidatedWeather[0].maxTemp.roundToInt().toString()
-                    val cityName = response.data.title
-                    text = "$cityName: $maxTemp"
-                }
+                bindData(response.data)
             }
+        }
+    }
+
+    private fun bindData(data: WeatherResponse){
+        binding.textMaxTemp.run {
+            show()
+            val maxTemp = data.consolidatedWeather[0].maxTemp.roundToInt().toString()
+            val cityName = data.title
+            text = "$cityName: $maxTemp"
         }
     }
 

@@ -38,7 +38,7 @@ object WeatherRepository {
 
     }
 
-    fun getLocationInfo(cityName: String): Observable<Status<LocationResponse>> {
+    private fun getLocationInfo(cityName: String): Observable<Status<LocationResponse>> {
         return Observable.create { emitter ->
             emitter.onNext(Status.Loading)
             emitter.onNext(Client.getLocationResponse(cityName))
