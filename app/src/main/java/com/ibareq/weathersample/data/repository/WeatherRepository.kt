@@ -1,49 +1,30 @@
 package com.ibareq.weathersample.data.repository
 
+import android.util.Log
 import com.ibareq.weathersample.data.Status
 import com.ibareq.weathersample.data.network.Client
-import io.reactivex.rxjava3.core.Observable
-import com.ibareq.weathersample.data.response.WeatherResponse
-import com.ibareq.weathersample.data.response.LocationResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 
 object WeatherRepository {
-    fun getWeatherForCity(cityName: String): Observable<Status<WeatherResponse>> {
-        return getLocationInfo(cityName).flatMap {
-            when(it){
-                is Status.Error -> {
-                    Observable.create{ emitter ->
-                        emitter.onNext(it)
-                        emitter.onComplete()
-                    }
+    fun getWeatherForCity(cityName: String)  = getLocationInfo(cityName).flatMapConcat {
+            flow {
+                when(it){
+                    is Status.Error -> emit(it)
+                    is Status.Loading -> emit(it)
+                    is Status.Success ->
+                        if (it.data.isEmpty())
+                            emit(Status.Error("city not found"))
+                        else
+                            emit(Client.getWeatherForCity(it.data[0].cityId)) //to make it easier we pick the first city and skip others
                 }
-                is Status.Loading -> {
-                    Observable.create{ emitter ->
-                        emitter.onNext(it)
-                        emitter.onComplete()
-                    }
-                }
-                is Status.Success -> {
-                    Observable.create { emitter ->
-                        if (it.data.isEmpty()){
-                            emitter.onNext(Status.Error("city not found"))
-                        } else {
-                            emitter.onNext(Client.getWeatherForCity(it.data[0].cityId)) //to make it easier we pick the first city and skip others
-                        }
-                        emitter.onComplete()
-                    }
-                }
-            }
+            }.onCompletion { Log.i("COMPLETE" , "Done1") }.flowOn(Dispatchers.IO).conflate()
         }
 
-    }
-
-    private fun getLocationInfo(cityName: String): Observable<Status<LocationResponse>> {
-        return Observable.create { emitter ->
-            emitter.onNext(Status.Loading)
-            emitter.onNext(Client.getLocationResponse(cityName))
-            emitter.onComplete()
-        }
-    }
+    private fun getLocationInfo(cityName: String) = flow{
+                emit(Status.Loading)
+                emit(Client.getLocationResponse(cityName))
+    }.onCompletion { Log.i("COMPLETE" , "Done2") }.flowOn(Dispatchers.IO).conflate()
 
 }
