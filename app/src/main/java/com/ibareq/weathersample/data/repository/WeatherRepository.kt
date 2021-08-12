@@ -17,7 +17,8 @@ object WeatherRepository {
                         if (it.data.isEmpty())
                             emit(Status.Error("city not found"))
                         else
-                            emit(Client.getWeatherForCity(it.data[0].cityId)) //to make it easier we pick the first city and skip others
+                            emit(Client.getWeatherForCity(it.data[0].cityId))
+                            //to make it easier we pick the first city and skip others
                 }
             }.onCompletion { Log.i("COMPLETE" , "Done1") }.flowOn(Dispatchers.IO).conflate()
         }

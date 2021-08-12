@@ -1,50 +1,38 @@
 package com.ibareq.weathersample.ui
 
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import com.ibareq.weathersample.data.Status
 import com.ibareq.weathersample.data.response.WeatherResponse
 import com.ibareq.weathersample.databinding.ActivityMainBinding
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import com.ibareq.weathersample.data.repository.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.ibareq.weathersample.presenter.MainPresenter
+import com.ibareq.weathersample.ui.Interface.iMainView
 import kotlin.math.roundToInt
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), iMainView {
 
     private lateinit var binding: ActivityMainBinding
+
+    private lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        presenter = MainPresenter()
+        presenter.mainView = this
+
         binding.buttonSearch.setOnClickListener {
-            getWeatherForCity(binding.inputCityName.text.toString())
+             presenter.getWeatherForCity(binding.inputCityName.text.toString())
         }
     }
 
-    fun getWeatherForCity(cityName: String){
-        lifecycleScope.launch{
-            val result = withContext(Dispatchers.IO) {
-                WeatherRepository.getWeatherForCity(cityName)
-                    .catch { e -> Log.i(TAG, "${e.message}") }
-            }
-            result.collect(::onWeatherResult)
-        }
-    }
-
-    private fun onWeatherResult(response: Status<WeatherResponse>){
+    override fun onWeatherResult(response: Status<WeatherResponse>){
+        Log.i("hhhhhhhh" , response.toString())
         hideAllViews()
         when(response){
             is Status.Error -> binding.imageError.show()
@@ -70,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
     companion object{
         const val TAG = "BK_PROGRAMMER"
     }
