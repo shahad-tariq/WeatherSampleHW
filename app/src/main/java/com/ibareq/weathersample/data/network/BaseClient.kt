@@ -7,8 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.lang.Exception
 
-abstract class BaseClientResp {
-
+abstract class BaseClient {
     private val okHttpClient = OkHttpClient()
     protected val baseUrl = "https://www.metaweather.com/api/"
     protected val gson = Gson()

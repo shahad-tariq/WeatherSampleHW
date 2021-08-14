@@ -1,6 +1,7 @@
 package com.ibareq.weathersample.data.repository
 
 import android.util.Log
+import com.ibareq.weathersample.Const.TAG
 import com.ibareq.weathersample.data.Status
 import com.ibareq.weathersample.data.network.ClientLocation
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,7 @@ object LocationInfoForCity {
         emit(Status.Loading)
         emit(ClientLocation.getLocationResponse(cityName))
     }
-        .onCompletion { Log.i("COMPLETE" , "Done getLocationInfo") }
+        .onCompletion { Log.i(TAG , "Done getLocationInfo") }
         .flowOn(Dispatchers.IO)
         .conflate()
 }
