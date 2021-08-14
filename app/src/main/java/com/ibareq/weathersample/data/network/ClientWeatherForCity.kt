@@ -6,15 +6,6 @@ import okhttp3.Request
 
 object ClientWeatherForCity : BaseClientResp() {
     fun getWeatherForCity(cityId: Int): Status<WeatherResponse> {
-        val request = Request
-            .Builder()
-            .url("${baseUrl}location/$cityId/")
-            .build()
-
-        val response = okHttpClient
-            .newCall(request)
-            .execute()
-
-        return checkClient<WeatherResponse>(response)
+         return checkClient<WeatherResponse>(getResponse("${baseUrl}location/$cityId/"))
     }
 }

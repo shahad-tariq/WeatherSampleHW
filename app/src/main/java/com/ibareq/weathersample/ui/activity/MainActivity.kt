@@ -1,8 +1,5 @@
 package com.ibareq.weathersample.ui.activity
 
-
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.view.LayoutInflater
 import com.ibareq.weathersample.data.Status
 import com.ibareq.weathersample.data.response.WeatherResponse
@@ -37,6 +34,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), IMain {
 
     override fun onWeatherResult(response: Status<WeatherResponse>){
         hideAllViews()
+
         when(response){
             is Status.Error -> binding!!.imageError.show()
             is Status.Loading -> binding!!.progressLoading.show()
